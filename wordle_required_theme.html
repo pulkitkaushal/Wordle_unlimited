@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#d6c09a">
+<title>Wordle</title>
+<style>
+:root{--ink:#30281f;--muted:#756957;--paper:#e8d8b7;--green:#6f8453;--yellow:#b28c45;--gray:#8e8373}
+*{box-sizing:border-box} body{margin:0;min-height:100vh;padding:20px 10px;color:var(--ink);font-family:Georgia,"Times New Roman",serif;background:linear-gradient(135deg,#cdb78e,#b79a69)}
+.scroll{width:min(520px,100%);margin:auto;padding:32px 16px 24px;border:1px solid rgba(92,68,38,.35);border-radius:18px;background:
+radial-gradient(circle at 20% 10%,rgba(255,255,255,.28),transparent 28%),
+radial-gradient(circle at 80% 90%,rgba(90,64,32,.08),transparent 30%),var(--paper);
+box-shadow:0 18px 50px rgba(53,40,23,.25),inset 0 0 40px rgba(90,64,32,.08)}
+header{text-align:center}.eyebrow{font:600 10px/1 Arial,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+h1{margin:8px 0 0;font-size:34px;letter-spacing:.04em}.rule{width:72px;height:1px;background:#9a7c52;margin:12px auto 9px}.sub{margin:0;color:var(--muted);font-size:13px}
+.lock{width:max-content;margin:16px auto 4px;padding:7px 11px;border:1px solid rgba(96,78,51,.28);border-radius:999px;background:rgba(255,255,255,.22);font:700 12px Arial,sans-serif;color:#5d523f}
+.board{display:grid;gap:7px;justify-content:center;margin:22px 0 18px}.row{display:grid;grid-template-columns:repeat(5,58px);gap:7px}.tile{width:58px;height:58px;display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(83,65,42,.38);border-radius:8px;background:rgba(255,250,237,.4);font:700 28px Arial,sans-serif}
+.green{background:var(--green)!important;color:#fff!important}.yellow{background:var(--yellow)!important;color:#fff!important}.gray{background:var(--gray)!important;color:#fff!important}
+.controls{display:flex;gap:8px;justify-content:center}.controls input{width:190px;padding:12px;border-radius:10px;border:1px solid rgba(83,65,42,.35);background:rgba(255,250,237,.65);text-align:center;text-transform:uppercase;font:700 17px Arial,sans-serif;color:var(--ink);outline:none}
+button{padding:12px 15px;border:1px solid #59472f;border-radius:10px;background:#463723;color:#f7edd9;font:700 14px Arial,sans-serif}.secondary{background:transparent;color:#5c4a31;border-color:rgba(83,65,42,.35)}
+.msg{text-align:center;min-height:24px;margin:8px 0 12px;font:700 14px Arial,sans-serif}
+.keyboard{display:grid;gap:6px;margin:16px auto 4px;max-width:450px}.keyrow{display:flex;gap:5px;justify-content:center}.key{min-width:30px;height:43px;padding:0 7px;border:none;border-radius:6px;background:rgba(93,76,54,.18);color:var(--ink);font:700 12px Arial,sans-serif}.wide{min-width:52px;font-size:10px}
+.footer{text-align:center;margin-top:16px}.result{display:none;margin-top:18px;padding:16px;border:1px solid rgba(93,76,54,.24);border-radius:12px;background:rgba(255,250,237,.35);text-align:center}.answer{font-size:26px;font-weight:700;letter-spacing:.12em;margin:5px 0 8px}.verified{display:inline-block;padding:6px 9px;border-radius:999px;background:rgba(111,132,83,.14);color:#52653b;font:700 12px Arial,sans-serif}
+details{margin-top:12px;text-align:left;color:var(--muted);font:12px/1.5 Arial,sans-serif}summary{text-align:center;cursor:pointer}.tech{margin-top:8px;padding:10px;border-radius:8px;background:rgba(255,255,255,.24);word-break:break-all}.micro{text-align:center;margin-top:18px;color:#7e715d;font:11px/1.4 Arial,sans-serif}
+@media(max-width:390px){.scroll{padding:28px 9px 22px}.row{grid-template-columns:repeat(5,52px)}.tile{width:52px;height:52px}.key{min-width:27px;padding:0 5px}}
+
+/* ===== Theme system ===== */
+.theme-picker{
+  display:flex;
+  justify-content:center;
+  gap:7px;
+  margin:14px auto 2px;
+}
+.theme-option{
+  appearance:none;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid rgba(83,65,42,.32);
+  background:rgba(255,255,255,.18);
+  color:var(--ink);
+  font:700 12px/1 Arial,Helvetica,sans-serif;
+}
+.theme-option.active{
+  background:#463723;
+  color:#f7edd9;
+  border-color:#463723;
+}
+
+/* Modern theme */
+body[data-theme="modern"]{
+  --ink:#f5f5f5;
+  --muted:#a9a9ad;
+  --paper:#121213;
+  --green:#538d4e;
+  --yellow:#b59f3b;
+  --gray:#3a3a3c;
+  background:#121213;
+  font-family:Arial,Helvetica,sans-serif;
+}
+body[data-theme="modern"] .scroll{
+  background:#121213;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  max-width:520px;
+}
+body[data-theme="modern"] .eyebrow{
+  display:none;
+}
+body[data-theme="modern"] h1{
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:32px;
+  letter-spacing:.12em;
+}
+body[data-theme="modern"] .rule{
+  background:#3a3a3c;
+  width:100%;
+  margin:12px 0 10px;
+}
+body[data-theme="modern"] .sub,
+body[data-theme="modern"] .micro{
+  color:#a9a9ad;
+}
+body[data-theme="modern"] .lock{
+  background:#1d1d1f;
+  color:#cfcfd2;
+  border-color:#3a3a3c;
+}
+body[data-theme="modern"] .tile{
+  border-color:#3a3a3c;
+  background:#121213;
+  border-radius:0;
+  box-shadow:none;
+  color:#fff;
+}
+body[data-theme="modern"] .controls input{
+  background:#1d1d1f;
+  border-color:#3a3a3c;
+  color:#fff;
+}
+body[data-theme="modern"] button{
+  background:#e7e7e7;
+  color:#111;
+  border-color:#e7e7e7;
+}
+body[data-theme="modern"] .secondary,
+body[data-theme="modern"] .theme-option{
+  background:#1d1d1f;
+  color:#ddd;
+  border-color:#3a3a3c;
+}
+body[data-theme="modern"] .theme-option.active{
+  background:#fff;
+  color:#111;
+  border-color:#fff;
+}
+body[data-theme="modern"] .key{
+  background:#818384;
+  color:#fff;
+}
+body[data-theme="modern"] .result{
+  background:#1d1d1f;
+  border-color:#3a3a3c;
+}
+body[data-theme="modern"] .verified{
+  background:rgba(83,141,78,.18);
+  color:#98c594;
+}
+body[data-theme="modern"] details,
+body[data-theme="modern"] summary{
+  color:#aaa;
+}
+body[data-theme="modern"] .tech{
+  background:#161618;
+}
+
+</style>
+</head>
+<body>
+<main class="scroll">
+<header><div class="eyebrow">A five-letter diversion</div><h1>Wordle</h1><div class="rule"></div><p class="sub">Six attempts. One locked word.</p></header>
+
+<p id="themePrompt" style="text-align:center;margin:15px 0 8px;font:700 13px Arial,sans-serif;">Choose a theme to begin</p>
+<div class="theme-picker" aria-label="Choose appearance">
+  <button class="theme-option" id="modernTheme" type="button">Modern</button>
+  <button class="theme-option" id="periodTheme" type="button">Period</button>
+</div>
+
+<div id="gameArea" hidden>
+<div class="lock" id="lock">🔒 Answer locked</div>
+<section id="board" class="board"></section>
+<div class="controls"><input id="guess" maxlength="5" placeholder="ENTER WORD" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"><button id="submit">Guess</button></div>
+<div id="msg" class="msg"></div>
+<section id="keyboard" class="keyboard"></section>
+<div class="footer"><button id="newGame" class="secondary">New Game</button></div>
+<section id="result" class="result"></section>
+<div class="micro">The answer is fixed before your first guess and never changes mid-game.</div>
+</div>
+</main>
+<script>
+const WORDS=["ABOUT","ABOVE","ACTOR","ADORE","AFTER","AGAIN","AGENT","ALIVE","ALLOW","ALONE","APPLE","APPLY","ARGUE","ARISE","ARRAY","AUDIO","AVOID","BASIC","BEACH","BEGIN","BLACK","BLAME","BLEND","BLIND","BLOCK","BLOOD","BOARD","BOOST","BRAIN","BRAND","BREAD","BREAK","BRING","BROAD","BROWN","BUILD","BUYER","CAUSE","CHAIN","CHAIR","CHARM","CHART","CHASE","CHEAP","CHECK","CHEST","CHILD","CHOIR","CLEAN","CLEAR","CLIMB","CLOCK","CLOUD","COACH","COAST","COLOR","COUNT","COURT","COVER","CRASH","CREAM","CRIME","CROSS","CROWD","DAILY","DANCE","DEATH","DELAY","DEPTH","DOUBT","DOZEN","DRAFT","DREAM","DRINK","DRIVE","EARLY","EARTH","EIGHT","ENJOY","ENTER","ENTRY","EQUAL","ERROR","EVENT","EVERY","EXACT","EXIST","EXTRA","FAITH","FALSE","FAULT","FIELD","FINAL","FIRST","FLAME","FLOOR","FOCUS","FORCE","FRAME","FRESH","FRONT","FRUIT","FUNNY","GIANT","GLASS","GRACE","GRADE","GRAIN","GRAND","GRANT","GRASS","GREAT","GREEN","GROUP","GUARD","GUESS","GUIDE","HAPPY","HEART","HEAVY","HORSE","HOTEL","HOUSE","HUMAN","IDEAL","IMAGE","INDEX","INNER","ISSUE","JOINT","JUDGE","KNOWN","LARGE","LASER","LATER","LEARN","LIGHT","LIMIT","LOCAL","LOGIC","LUCKY","LUNCH","MAJOR","MARCH","MATCH","MAYBE","METAL","MIGHT","MINOR","MONEY","MONTH","MOTOR","MOUSE","MOUTH","MUSIC","NEVER","NIGHT","NOISE","NORTH","NOVEL","NURSE","OCEAN","OFFER","OFTEN","ORDER","OTHER","PAINT","PANEL","PAPER","PARTY","PEACE","PHONE","PHOTO","PIANO","PIECE","PILOT","PLACE","PLAIN","PLANE","PLANT","PLATE","POINT","POWER","PRESS","PRICE","PRIDE","PRIME","PRINT","PRIZE","PROUD","QUEEN","QUICK","QUIET","RADIO","RAISE","RANGE","REACH","READY","RIGHT","RIVER","ROUND","ROUTE","ROYAL","SCALE","SCENE","SCORE","SENSE","SERVE","SHADE","SHAKE","SHAPE","SHARE","SHARP","SHEET","SHIFT","SHINE","SHIRT","SHOCK","SHORT","SHOWN","SIGHT","SINCE","SKILL","SLATE","SMALL","SMART","SMILE","SOLID","SOLVE","SOUND","SOUTH","SPACE","SPEED","SPEND","SPORT","STAGE","STAND","START","STATE","STEAM","STEEL","STICK","STILL","STONE","STORE","STORM","STORY","STUDY","STYLE","SUGAR","TABLE","TAKEN","TASTE","TEACH","THANK","THEIR","THEME","THERE","THING","THINK","THIRD","THOSE","THREE","THROW","TIGER","TITLE","TODAY","TOTAL","TOUCH","TOUGH","TOWER","TRACK","TRADE","TRAIN","TREAT","TREND","TRIAL","TRUCK","TRUST","TRUTH","UNDER","UNION","VALUE","VIDEO","VOICE","WASTE","WATCH","WATER","WHEEL","WHERE","WHICH","WHILE","WHITE","WHOLE","WOMAN","WORLD","WORRY","WRITE","WRONG","YOUNG"];
+let WORDLE_SECRET,WORDLE_ORIGINAL_SECRET,WORDLE_SALT,WORDLE_COMMITMENT,WORDLE_GUESSES=[],gameOver=false; const keyState={};
+function randHex(n=16){const a=new Uint8Array(n);crypto.getRandomValues(a);return [...a].map(b=>b.toString(16).padStart(2,"0")).join("")}
+async function sha256(t){const d=new TextEncoder().encode(t),h=await crypto.subtle.digest("SHA-256",d);return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,"0")).join("")}
+function scoreGuess(secret,guess){const s=secret.split(""),g=guess.split(""),r=Array(5).fill("gray"),used=Array(5).fill(false);for(let i=0;i<5;i++)if(g[i]===s[i]){r[i]="green";used[i]=true;g[i]=null}for(let i=0;i<5;i++){if(g[i]===null)continue;for(let j=0;j<5;j++)if(!used[j]&&g[i]===s[j]){r[i]="yellow";used[j]=true;break}}return r}
+function renderBoard(){const b=document.getElementById("board");b.innerHTML="";for(let r=0;r<6;r++){const row=document.createElement("div");row.className="row";const rec=WORDLE_GUESSES[r];for(let c=0;c<5;c++){const t=document.createElement("div");t.className="tile";if(rec){t.textContent=rec.guess[c];t.classList.add(rec.score[c])}row.appendChild(t)}b.appendChild(row)}}
+const rows=["QWERTYUIOP","ASDFGHJKL","ZXCVBNM"];
+function renderKeyboard(){const kb=document.getElementById("keyboard");kb.innerHTML="";rows.forEach((letters,idx)=>{const row=document.createElement("div");row.className="keyrow";if(idx===2){const e=document.createElement("button");e.className="key wide";e.textContent="ENTER";e.onclick=submitGuess;row.appendChild(e)}[...letters].forEach(l=>{const b=document.createElement("button");b.className="key";b.textContent=l;if(keyState[l])b.classList.add(keyState[l]);b.onclick=()=>appendLetter(l);row.appendChild(b)});if(idx===2){const d=document.createElement("button");d.className="key wide";d.textContent="⌫";d.onclick=backspace;row.appendChild(d)}kb.appendChild(row)})}
+function appendLetter(l){if(gameOver)return;const i=document.getElementById("guess");if(i.value.length<5)i.value=(i.value+l).toUpperCase()}
+function backspace(){const i=document.getElementById("guess");i.value=i.value.slice(0,-1)}
+function updateKeyboard(g,s){const rank={gray:1,yellow:2,green:3};for(let i=0;i<5;i++){const l=g[i];if(!keyState[l]||rank[s[i]]>rank[keyState[l]])keyState[l]=s[i]}renderKeyboard()}
+async function initGame(){WORDLE_SECRET=WORDS[Math.floor(Math.random()*WORDS.length)];WORDLE_ORIGINAL_SECRET=WORDLE_SECRET;WORDLE_SALT=randHex();WORDLE_GUESSES=[];gameOver=false;Object.keys(keyState).forEach(k=>delete keyState[k]);WORDLE_COMMITMENT=await sha256(WORDLE_SECRET+":"+WORDLE_SALT);document.getElementById("lock").textContent="🔒 Answer locked";document.getElementById("result").style.display="none";document.getElementById("result").innerHTML="";document.getElementById("msg").textContent="Guess #1";document.getElementById("guess").value="";renderBoard();renderKeyboard()}
+async function finish(won){const recomputed=await sha256(WORDLE_SECRET+":"+WORDLE_SALT),match=recomputed===WORDLE_COMMITMENT,r=document.getElementById("result");r.style.display="block";r.innerHTML=`<div>${won?"Well played.":"The word was"}</div><div class="answer">${WORDLE_SECRET}</div><div class="verified">${match?"✓ Answer integrity verified":"⚠ Verification failed"}</div><details><summary>Verification details</summary><div class="tech"><strong>Salt</strong><br>${WORDLE_SALT}<br><br><strong>Original commitment</strong><br>${WORDLE_COMMITMENT}<br><br><strong>Recomputed commitment</strong><br>${recomputed}</div></details>`}
+async function submitGuess(){if(gameOver)return;if(!WORDLE_SECRET||!WORDLE_ORIGINAL_SECRET||WORDLE_SECRET!==WORDLE_ORIGINAL_SECRET){gameOver=true;document.getElementById("msg").textContent="Game state validation failed.";document.getElementById("lock").textContent="⚠ State invalid";return}const input=document.getElementById("guess"),guess=input.value.trim().toUpperCase();if(!/^[A-Z]{5}$/.test(guess)){document.getElementById("msg").textContent="Enter exactly five letters.";return}const score=scoreGuess(WORDLE_SECRET,guess),history=[...WORDLE_GUESSES,{guess,score}];for(const rec of history){const rs=scoreGuess(WORDLE_SECRET,rec.guess);if(JSON.stringify(rs)!==JSON.stringify(rec.score)){gameOver=true;document.getElementById("msg").textContent="Game state validation failed.";return}}WORDLE_GUESSES=history;updateKeyboard(guess,score);renderBoard();input.value="";if(guess===WORDLE_SECRET){gameOver=true;document.getElementById("msg").textContent=`Solved in ${WORDLE_GUESSES.length}/6`;await finish(true);return}if(WORDLE_GUESSES.length>=6){gameOver=true;document.getElementById("msg").textContent="Six attempts used.";await finish(false);return}document.getElementById("msg").textContent=`Guess #${WORDLE_GUESSES.length+1}`}
+
+let themeChosen = false;
+
+function applyTheme(theme){
+  const chosen = theme === "period" ? "period" : "modern";
+  themeChosen = true;
+  document.body.dataset.theme = chosen;
+  document.getElementById("modernTheme").classList.toggle("active", chosen === "modern");
+  document.getElementById("periodTheme").classList.toggle("active", chosen === "period");
+  document.getElementById("themePrompt").textContent =
+    chosen === "modern" ? "Modern theme selected" : "Period theme selected";
+  document.getElementById("gameArea").hidden = false;
+
+  // The game is initialized only AFTER the player explicitly chooses.
+  initGame();
+  setTimeout(() => document.getElementById("guess").focus(), 50);
+}
+
+document.getElementById("modernTheme").onclick = () => applyTheme("modern");
+document.getElementById("periodTheme").onclick = () => applyTheme("period");
+
+document.getElementById("submit").onclick=submitGuess;document.getElementById("newGame").onclick=initGame;document.getElementById("guess").addEventListener("keydown",e=>{if(e.key==="Enter")submitGuess()});
+</script>
+</body>
+</html>
